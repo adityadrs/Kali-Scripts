@@ -7,5 +7,4 @@ Download the latest version of Kali from the official website:
 The scripts have been changed to best fit my preferences.
 
 
-
 Original script is located in the <i>"Original"</i> folder. ([link](https://github.com/g0tmi1k/os-scripts) to repo)
