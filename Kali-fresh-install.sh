@@ -38,8 +38,8 @@
 ################################################################################
 ### One liner - Grab the latest version and execute! ###########################
 ################################################################################
-#wget -qO kali-rolling.sh https://raw.github.com/g0tmi1k/os-scripts/master/kali-rolling.sh \
-#  && bash kali-rolling.sh -burp -keyboard us -timezone "Delhi/India"
+https://raw.githubusercontent.com/adityadrs/Kali-Scripts/master/Kali-fresh-install.sh
+  && bash Kali-fresh-install.sh -burp -keyboard us -timezone "Delhi/India"
 ################################################################################
 #fi
 
