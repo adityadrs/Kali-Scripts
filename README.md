@@ -1,9 +1,9 @@
-#Kali Linux 2017.3
+# Kali Linux 2017.3
 
 Download the latest version of Kali from the official website:
 <https://help.github.com/articles/ignoring-files/#create-a-global-gitignore>
 
-##Contents
+## Contents
 The scripts have been changed to best fit my preferences.
 
 
