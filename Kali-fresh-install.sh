@@ -6,7 +6,7 @@
 #-Author(s)---------------------------------------------------#
 #  Aditya Dhan Raj Singh                                      #
 #-Operating System--------------------------------------------#
-#     Tested on: Kali Linux 2017.3 x64 						  #
+#     Tested on: Kali Linux 2017.3 x64                        #
 #     Kali v1.x: https://g0tmi1k/os-scripts/master/kali1.sh   #
 #     Kali v2.x: https://g0tmi1k/os-scripts/master/kali2.sh   #
 #-Licence-----------------------------------------------------#
@@ -34,14 +34,14 @@
 #-------------------------------------------------------------#
 
 #change this to your own repository, and script lication
-#if [ 1 -eq 0 ]; then    # This is never true, thus it acts as block comments ;)
+if [ 1 -eq 0 ]; then    # This is never true, thus it acts as block comments ;)
 ################################################################################
 ### One liner - Grab the latest version and execute! ###########################
 ################################################################################
-https://raw.githubusercontent.com/adityadrs/Kali-Scripts/master/Kali-fresh-install.sh
+https://raw.githubusercontent.com/adityadrs/Kali-Scripts/master/Kali-fresh-install.sh \
   && bash Kali-fresh-install.sh -burp -keyboard us -timezone "Delhi/India"
 ################################################################################
-#fi
+fi
 
 
 #-Defaults-------------------------------------------------------------#
@@ -250,6 +250,47 @@ if [[ "$?" -ne 0 ]]; then
 fi
 
 
+##### Update location information - set either value to "" to skip.
+(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Updating ${GREEN}location information${RESET}"
+#--- Configure keyboard layout (Apple)
+if [ "${keyboardApple}" != "false" ]; then
+  ( (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Applying ${GREEN}Apple hardware${RESET} profile" )
+  file=/etc/default/keyboard; #[ -e "${file}" ] && cp -n $file{,.bkup}
+  sed -i 's/XKBVARIANT=".*"/XKBVARIANT="mac"/' "${file}"
+fi
+#--- Configure keyboard layout (location)
+if [[ -n "${keyboardLayout}" ]]; then
+  (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Updating ${GREEN}location information${RESET} ~ keyboard layout (${BOLD}${keyboardLayout}${RESET})"
+  geoip_keyboard=$(curl -s http://ifconfig.io/country_code | tr '[:upper:]' '[:lower:]')
+  [ "${geoip_keyboard}" != "${keyboardLayout}" ] \
+    && echo -e " ${YELLOW}[i]${RESET} Keyboard layout (${BOLD}${keyboardLayout}${RESET}) doesn't match what's been detected via GeoIP (${BOLD}${geoip_keyboard}${RESET})"
+  file=/etc/default/keyboard; #[ -e "${file}" ] && cp -n $file{,.bkup}
+  sed -i 's/XKBLAYOUT=".*"/XKBLAYOUT="'${keyboardLayout}'"/' "${file}"
+else
+  echo -e "\n\n ${YELLOW}[i]${RESET} ${YELLOW}Skipping keyboard layout${RESET} (missing: '$0 ${BOLD}--keyboard <value>${RESET}')..." 1>&2
+fi
+#--- Changing time zone
+if [[ -n "${timezone}" ]]; then
+  (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Updating ${GREEN}location information${RESET} ~ time zone (${BOLD}${timezone}${RESET})"
+  echo "${timezone}" > /etc/timezone
+  ln -sf "/usr/share/zoneinfo/$(cat /etc/timezone)" /etc/localtime
+  dpkg-reconfigure -f noninteractive tzdata
+else
+  echo -e "\n\n ${YELLOW}[i]${RESET} ${YELLOW}Skipping time zone${RESET} (missing: '$0 ${BOLD}--timezone <value>${RESET}')..." 1>&2
+fi
+#--- Installing ntp tools
+(( STAGE++ )); echo -e " ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}ntpdate${RESET} ~ keeping the time in sync"
+apt -y -qq install ntp ntpdate \
+  || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
+#--- Update time
+ntpdate -b -s -u pool.ntp.org
+#--- Start service
+systemctl restart ntp
+#--- Remove from start up
+systemctl disable ntp 2>/dev/null
+#--- Only used for stats at the end
+start_time=$(date +%s)
+
 ##### Update OS from network repositories
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) ${GREEN}Updating OS${RESET} from network repositories"
 echo -e " ${YELLOW}[i]${RESET}  ...this ${BOLD}may take a while${RESET} depending on your Internet connection & Kali version/age"
@@ -319,7 +360,7 @@ if [[ $(dmidecode | grep -i virtual) ]]; then
   (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Configuring ${GREEN}login screen${RESET}"
   #--- Enable auto (gui) login
   file=/etc/gdm3/daemon.conf; [ -e "${file}" ] && cp -n $file{,.bkup}
-  sed -i 's/^.*AutomaticLoginEnable = .*/AutomaticLoginEnable = true/' "${file}"
+  sed -i 's/^.*AutomaticLoginEnable = .*/AutomaticLoginEnable = false/' "${file}"
   sed -i 's/^.*AutomaticLogin = .*/AutomaticLogin = root/' "${file}"
 fi
 
@@ -365,14 +406,24 @@ grep -q '^file:///tmp ' "${file}" 2>/dev/null \
   || echo 'file:///tmp /TMP' >> "${file}"
 grep -q '^file:///work ' "${file}" 2>/dev/null \
   || echo 'file:///work Work' >> "${file}"
+mkdir /work/github
 grep -q '^file:///work/github ' "${file}" 2>/dev/null \
   || echo 'file:///work/github GitHub' >> "${file}"
+mkdir /work/ArIES
 grep -q '^file:///work/ArIES ' "${file}" 2>/dev/null \
   || echo 'file:///work/ArIES ArIES' >> "${file}"
+mkdir /work/machine_learning
 grep -q '^file:///work/machine_learning ' "${file}" 2>/dev/null \
   || echo 'file:///work/machine_learning ML' >> "${file}"
+mkdir /work/machine_learning/neuralnetwork 
 grep -q '^file:///work/machine_learning/neuralnetwork ' "${file}" 2>/dev/null \
   || echo 'file:///work/machine_learning/neuralnetwork NN' >> "${file}"
+
+##### Configure GNOME terminal   Note: need to restart xserver for effect
+(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Configuring GNOME ${GREEN}terminal${RESET} ~ CLI interface"
+gconftool-2 -t bool -s /apps/gnome-terminal/profiles/Default/scrollback_unlimited true
+gconftool-2 -t string -s /apps/gnome-terminal/profiles/Default/background_type transparent
+gconftool-2 -t string -s /apps/gnome-terminal/profiles/Default/background_darkness 0.85611499999999996
 
 ##### Configure bash - all users
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Configuring ${GREEN}bash${RESET} ~ CLI shell"
@@ -856,23 +907,17 @@ git config --global mergetool.prompt false
 #--- Set as default push
 git config --global push.default simple
 
-##### Setup firefox
-(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}firefox${RESET} ~ GUI web browser"
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+#Install the GPG key:
+(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}Sublime Text${RESET} ~ Text editor"
+wget -qO - https://download.sublimetext.com/sublimehq-pub.gpg | sudo apt-key add -
+#Ensure apt is set up to work with https sources:
+sudo apt-get install apt-transport-https
+#Select the channel to use:
+#Stable
+echo "deb https://download.sublimetext.com/ apt/stable/" | sudo tee /etc/apt/sources.list.d/sublime-text.list
+apt-get install sublime-text
 
 ##### Install metasploit ~ http://docs.kali.org/general-use/starting-metasploit-framework-in-kali
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}metasploit${RESET} ~ exploit framework"
@@ -977,6 +1022,7 @@ msfvenom --list nops > ~/.msf4/msfvenom/nops
 msfvenom --list payloads > ~/.msf4/msfvenom/payloads
 msfvenom --list encoders > ~/.msf4/msfvenom/encoders
 msfvenom --help-formats 2> ~/.msf4/msfvenom/formats
+
 #--- First time run with Metasploit
 (( STAGE++ )); echo -e " ${GREEN}[i]${RESET} (${STAGE}/${TOTAL}) ${GREEN}Starting Metasploit for the first time${RESET} ~ this ${BOLD}will take a ~350 seconds${RESET} (~6 mintues)"
 echo "Started at: $(date)"
