@@ -1,10 +1,10 @@
 # Errors that I faced while working around Kali 2017.3
- - [Nvidia](##nvidia)
- - [Pulseaudio](##Pulseaudio)
+ - [Nvidia](#nvidia)
+ - [Pulseaudio](##pulseaudio)
 
 
 
-## [Nvidia]
+## Nvidia
 
 nouveau driver issue or nouveau fifo error or nouveau error
 
@@ -42,7 +42,7 @@ what this does is reloads the btsub in the kernel so that it can take a new valu
 	
 	Manufacturer 		:       Lenovo
 	Model 				:       Lenovo Y510P
-	CPU 				:       Intel(R) Core(TM) i7-4700MQ CPU @ 2.40GHz (details)[info/CPU.info.txt]
+	CPU 				:       Intel(R) Core(TM) i7-4700MQ CPU @ 2.40GHz [details](info/CPU.info.txt)
 	Memory (RAM) 		:       8 GB
 	Storage 			:       1 TB (kali | HDD) + 500GB (Windows | HDD) 
 
