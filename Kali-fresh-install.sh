@@ -1,37 +1,36 @@
 #!/bin/bash
-#-Metadata----------------------------------------------------#
-# Filename: Kali-fresh-install.sh        (Update: 2018-01-23) #
-#-Info--------------------------------------------------------#
-#  Personal post-install script for Kali Linux Rolling        #
-#-Author(s)---------------------------------------------------#
-#  Aditya Dhan Raj Singh                                      #
-#-Operating System--------------------------------------------#
-#     Tested on: Kali Linux 2017.3 x64                        #
-#     Kali v1.x: https://g0tmi1k/os-scripts/master/kali1.sh   #
-#     Kali v2.x: https://g0tmi1k/os-scripts/master/kali2.sh   #
-#-Licence-----------------------------------------------------#
-#  MIT License ~ http://opensource.org/licenses/MIT           #
-#-Notes-------------------------------------------------------#
-#  Run as root straight after a clean install of Kali Rolling #
-#                             ---                             #
-#  You will need 25GB+ free HDD space before running.         #
-#                             ---                             #
-#  Command line arguments:                                    #
-#    -burp     = Automates configuring Burp Suite (Community) #
-#    -dns      = Use OpenDNS and locks permissions            #
-#    -openvas  = Installs & configures OpenVAS vuln scanner   #
-#    -osx      = Changes to Apple keyboard layout             #
-#                                                             #
-#    -keyboard <value> = Change the keyboard layout language  #
-#    -timezone <value> = Change the timezone location         #
-#                                                             #
-#  e.g. # bash kali-rolling.sh -burp -keyboard gb -openvas    #
-#                             ---                             #
-#  Will cut it up (so modular based), at a later date...      #
-#                             ---                             #
-#             ** This script is meant for _ME_. **            #
-#         ** EDIT this to meet _YOUR_ requirements! **        #
-#-------------------------------------------------------------#
+#------------Metadata---------------------------------------------------------------------------#
+#       Filename: Kali-fresh-install.sh        (Update: 2018-01-23)                             #
+#------------Info-------------------------------------------------------------------------------#
+#       Personal post-install script for Kali Linux Rolling                                     #
+#-Author(s)-------------------------------------------------------------------------------------#
+#       Aditya Dhan Raj Singh                                                                   #
+#-Operating System------------------------------------------------------------------------------#
+#       Tested on: Kali Linux 2017.3 x64                                                        #
+#       https://raw.githubusercontent.com/adityadrs/Kali-Scripts/master/Kali-fresh-install.sh   #
+#-Licence---------------------------------------------------------------------------------------#
+#       MIT License ~ http://opensource.org/licenses/MIT                                        #
+#-Notes-----------------------------------------------------------------------------------------#
+#       Run as root straight after a clean install of Kali Rolling                              #
+#                             ---------------                                                   #
+#       You will need 25GB+ free HDD space before running.                                      #
+#                             ---------------                                                   #
+#       Command line arguments:                                                                 #
+#       -burp     = Automates configuring Burp Suite (Community)                                #
+#       -dns      = Use OpenDNS and locks permissions                                           #
+#       -openvas  = Installs & configures OpenVAS vuln scanner                                  #
+#       -osx      = Changes to Apple keyboard layout                                            #
+#                                                                                               #
+#       -keyboard <value> = Change the keyboard layout language                                 #
+#       -timezone <value> = Change the timezone location                                        #
+#                                                                                               #
+#     e.g. # bash kali-rolling.sh -burp -keyboard gb -openvas                                   #
+#                             ---------------                                                   #
+#       Will cut it up (so modular based), at a later date...                                   #
+#                             ---------------                                                   #
+#                 ** This script is meant for _ME_. **                                          #
+#             ** EDIT this to meet _YOUR_ requirements! **                                      #
+#-----------------------------------------------------------------------------------------------#
 
 #change this to your own repository, and script lication
 if [ 1 -eq 0 ]; then    # This is never true, thus it acts as block comments ;)
@@ -226,7 +225,7 @@ timeout 300 curl --progress -k -L -f "https://status.github.com/api/status.json"
 
 ##### Enable default network repositories ~ http://docs.kali.org/general-use/kali-linux-sources-list-repositories
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Enabling default OS ${GREEN}network repositories${RESET}"
-#--- Add network repositories
+#--- Add network repositoires
 file=/etc/apt/sources.list; [ -e "${file}" ] && cp -n $file{,.bkup}
 ([[ -e "${file}" && "$(tail -c 1 ${file})" != "" ]]) && echo >> "${file}"
 #--- Main
@@ -1387,7 +1386,7 @@ popd >/dev/null
 ln -sf /usr/share/windows-binaries/uac-win7 /opt/uacscript-git/
 
 
-##### Install MiniReverse_Shell_With_Parameters
+##### Install MiniReverse Shell With Parameters
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}MiniReverse_Shell_With_Parameters${RESET} ~ Generate shellcode for a reverse shell"
 apt -y -qq install git windows-binaries \
   || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
@@ -2764,6 +2763,19 @@ git pull -q
 popd >/dev/null
 
 
+
+
+
+
+
+
+########################################################################################################
+########################################################################################################
+########################################################################################################
+########################################################################################################
+########################################################################################################
+
+
 ##### Preparing a jail ~ http://allanfeid.com/content/creating-chroot-jail-ssh-access // http://www.cyberciti.biz/files/lighttpd/l2chroot.txt
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Preparing up a ${GREEN}jail${RESET} ~ testing environment"
 apt -y -qq install debootstrap curl \
@@ -2808,37 +2820,6 @@ source "${file}" || source ~/.zshrc
 
 
 
-##### Clean the system
-(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) ${GREEN}Cleaning${RESET} the system"
-#--- Clean package manager
-for FILE in clean autoremove; do apt -y -qq "${FILE}"; done
-apt -y -qq purge $(dpkg -l | tail -n +6 | egrep -v '^(h|i)i' | awk '{print $2}')   # Purged packages
-#--- Update slocate database
-updatedb
-#--- Reset folder location
-cd ~/ &>/dev/null
-#--- Remove any history files (as they could contain sensitive info)
-history -cw 2>/dev/null
-for i in $(cut -d: -f6 /etc/passwd | sort -u); do
-  [ -e "${i}" ] && find "${i}" -type f -name '.*_history' -delete
-done
-
-
-##### Time taken
-finish_time=$(date +%s)
-echo -e "\n\n ${YELLOW}[i]${RESET} Time (roughly) taken: ${YELLOW}$(( $(( finish_time - start_time )) / 60 )) minutes${RESET}"
-echo -e " ${YELLOW}[i]${RESET} Stages skipped: $(( TOTAL-STAGE ))"
-
-
-
-
-
-
-########################################################################################################
-########################################################################################################
-########################################################################################################
-########################################################################################################
-########################################################################################################
 
 
 ##### Configure python console - all users
@@ -2896,6 +2877,29 @@ file=~/.local/share/applications/mimeapps.list; [ -e "${file}" ] && cp -n $file{
 ([[ -e "${file}" && "$(tail -c 1 ${file})" != "" ]]) && echo >> "${file}"
 echo -e 'application/x-ms-dos-executable=wine.desktop' >> "${file}"
 
+
+##### Clean the system
+(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) ${GREEN}Cleaning${RESET} the system"
+#--- Clean package manager
+for FILE in clean autoremove; do apt -y -qq "${FILE}"; done
+apt -y -qq purge $(dpkg -l | tail -n +6 | egrep -v '^(h|i)i' | awk '{print $2}')   # Purged packages
+#--- Update slocate database
+updatedb
+#--- Reset folder location
+cd ~/ &>/dev/null
+#--- Remove any history files (as they could contain sensitive info)
+history -cw 2>/dev/null
+for i in $(cut -d: -f6 /etc/passwd | sort -u); do
+  [ -e "${i}" ] && find "${i}" -type f -name '.*_history' -delete
+done
+
+
+
+
+##### Time taken
+finish_time=$(date +%s)
+echo -e "\n\n ${YELLOW}[i]${RESET} Time (roughly) taken: ${YELLOW}$(( $(( finish_time - start_time )) / 60 )) minutes${RESET}"
+echo -e " ${YELLOW}[i]${RESET} Stages skipped: $(( TOTAL-STAGE ))"
 
 
 #-Done-----------------------------------------------------------------#
