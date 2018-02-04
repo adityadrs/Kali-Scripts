@@ -18,7 +18,7 @@ Solution as suggested at official [documentation](https://docs.kali.org/general-
  - Remove all the installed drivers/addons from nvidia and reinstall GDM3 or any other display manager
 
  ```sh
-    $ apt-get purge "nvidia-*"
+    $ apt-get remove --purge "nvidia-*"
     $ reboot
     $ apt-get install gdm3
 ``` 
@@ -42,7 +42,7 @@ what this does is reloads the btsub in the kernel so that it can take a new valu
 	
 	Manufacturer 		:       Lenovo
 	Model 				:       Lenovo Y510P
-	CPU 				:       Intel(R) Core(TM) i7-4700MQ CPU @ 2.40GHz [details](info/CPU.info.txt)
+	CPU 				:       Intel(R) Core(TM) i7-4700MQ CPU @ 2.40GHz [details](/info/CPU.info.txt)
 	Memory (RAM) 		:       8 GB
 	Storage 			:       1 TB (kali | HDD) + 500GB (Windows | HDD) 
 
