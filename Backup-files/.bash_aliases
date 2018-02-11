@@ -222,6 +222,6 @@ alias ftproot="cd /var/ftp/"
 alias smb="cd /var/samba/"
 #alias smbroot="cd /var/samba/"
 
-## www
-alias wwwroot="cd /var/www/html/"
+## VirtualBox
+alias vm="virtualbox &"
 
