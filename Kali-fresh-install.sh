@@ -2762,7 +2762,14 @@ pushd /opt/gotty-git/ >/dev/null
 git pull -q
 popd >/dev/null
 
-
+##### Install imwheel
+(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}imwheel${RESET}"
+apt-get install imwheel\
+  || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
+touch ~/.imwheelrc
+echo '.*" \nNone,      Up,   Button4, 3 \nNone,      Down, Button5, 3 \nControl_L, Up,   Control_L|Button4\nControl_L, Down, Control_L|Button5 \nShift_L,   Up,   Shift_L|Button4 \nShift_L,   Down, Shift_L|Button5 \n'> ~/.imwheelrc
+echo 'imwheel --kill --buttons "4 5"'>> .bashrc
+popd >/dev/null
 
 
 
