@@ -2860,7 +2860,7 @@ source "${file}" || source ~/.zshrc
 
 ##### Install WINE
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}WINE${RESET} ~ run Windows programs on *nix"
-apt -y -qq install wine winetricks \
+apt -y -qq install wine winetricks wine32 \
   || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
 #--- Using x64?
 if [[ "$(uname -m)" == 'x86_64' ]]; then
