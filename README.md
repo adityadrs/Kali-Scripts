@@ -146,6 +146,7 @@ Application that will be installed are:
  - gotty
  - apt-file
  - apt-show-versions
+ - imwheel
 
 
 Downloads (Windows)
