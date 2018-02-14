@@ -146,6 +146,8 @@ Application that will be installed are:
  - gotty
  - apt-file
  - apt-show-versions
+ - imwheel
+ - wine32
 
 
 Downloads (Windows)
